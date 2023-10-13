@@ -1,10 +1,116 @@
-
+import java.lang.reflect.*;
 
 public class Inspector {
 
 	public void inspect(Object obj, boolean recursive)
 	{
 		//TODO INSPECT target AND DISPLAY INFORMATION ABOUT IT
+		Class<?> classObject = obj.getClass();
+		Class<?> superClassObj = classObject.getSuperclass();
+		Class<?>[] interfaces = classObject.getInterfaces();
+		Constructor<?>[] constructors = classObject.getDeclaredConstructors();
+		Method[] methods = classObject.getDeclaredMethods();
+		Field[] fields = classObject.getDeclaredFields();
+		
+		System.out.println("Class Name = " + classObject.getName());
+		if(superClassObj != null) {
+			System.out.println("Superclass = " + superClassObj.getName());
+		}
+		if(interfaces.length > 0) {
+			System.out.println("Interfaces: ");
+			for(Class<?> i: interfaces) {
+				System.out.println(i.getName());
+			}
+			System.out.println();
+		}
+		
+		if(constructors.length > 0)
+		{
+			System.out.println("Declared Constructors:");
+			for(Constructor<?> c: constructors) {
+				Class<?>[] params = c.getParameterTypes();
+				System.out.print(modifierString(c.getModifiers()));
+				System.out.print(c.getName()+ "(");
+				if(params.length > 0) {
+					for(int i = 0; i < params.length; i++) {
+						System.out.printf(params[i].getName());
+						if(i + 1 < params.length)
+							System.out.print(", ");
+					}
+				}	
+				System.out.println(") ");
+			}
+			System.out.println();
+		}
+		if(methods.length > 0)
+		{
+			System.out.println("Declared Methods: ");
+			for(Method m: methods) {
+				Class<?>[] params = m.getParameterTypes();
+				Class<?>[] exceptions = m.getExceptionTypes();
+				System.out.print(modifierString(m.getModifiers()));
+				System.out.print(m.getReturnType().getName() + " ");
+				System.out.print(m.getName()+ "(");
+				if(params.length > 0) {
+					for(int i = 0; i < params.length; i++) {
+						System.out.printf(params[i].getName());
+						if(i + 1 < params.length)
+							System.out.print(", ");
+					}
+				}	
+				System.out.print(") ");
+				if(exceptions.length > 0)
+				{
+					System.out.print("throws ");
+					for(Class<?> e: exceptions)
+					{
+						System.out.print(e.getName() + " ");
+					}
+				}
+				System.out.println();
+			}
+			System.out.println();
+		}
+		
+		if(fields.length > 0)
+		{
+			System.out.println("Declared Fields:");
+			for(Field f: fields) {
+				System.out.print(modifierString(f.getModifiers()));
+				System.out.print(f.getType().getName()+ " ");
+				System.out.print(f.getName());			
+				System.out.println();
+			}
+
+		}
+	}
+	public String modifierString(int m) {
+		String modifiers = "";
+		if(Modifier.isPublic(m))
+			modifiers += "public ";
+		if(Modifier.isProtected(m))
+			modifiers += "protected";
+		if(Modifier.isPrivate(m))
+			modifiers += "private ";
+		if(Modifier.isAbstract(m))
+			modifiers += "abstract ";
+		if(Modifier.isFinal(m))
+			modifiers += "final ";
+		if(Modifier.isStatic(m))
+			modifiers += "static ";
+		if(Modifier.isInterface(m))
+			modifiers += "interface ";
+		if(Modifier.isNative(m))
+			modifiers += "native ";
+		if(Modifier.isStrict(m))
+			modifiers += "strict ";
+		if(Modifier.isSynchronized(m))
+			modifiers += "synchronized ";
+		if(Modifier.isTransient(m))
+			modifiers += "transient ";
+		if(Modifier.isVolatile(m))
+			modifiers += "volatile ";
+		return modifiers;
 	}
 	
 }
