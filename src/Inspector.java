@@ -1,4 +1,4 @@
-package Inspection;
+
 
 public class Inspector {
 
