@@ -1,25 +1,37 @@
 import java.lang.reflect.*;
+import java.util.Vector;
 
 public class Inspector {
 
 	public void inspect(Object obj, boolean recursive)
 	{
+		Vector<Class<?>> classObjects = new Vector<Class<?>>();
 		//TODO INSPECT target AND DISPLAY INFORMATION ABOUT IT
-		Class<?> classObject = obj.getClass();
+		Class<?> classObject;
+
+	
+		classObjects.add(obj.getClass());
+		while(!classObjects.isEmpty())
+		{
+		classObject = classObjects.firstElement();
+		classObjects.remove(0);
+		
 		Class<?> superClassObj = classObject.getSuperclass();
 		Class<?>[] interfaces = classObject.getInterfaces();
 		Constructor<?>[] constructors = classObject.getDeclaredConstructors();
 		Method[] methods = classObject.getDeclaredMethods();
 		Field[] fields = classObject.getDeclaredFields();
-
+		
 		System.out.println("Class Name = " + classObject.getName());
 		if(superClassObj != null) {
 			System.out.println("Superclass = " + superClassObj.getName());
+			classObjects.add(superClassObj);
 		}
 		if(interfaces.length > 0) {
 			System.out.println("Interfaces: ");
 			for(Class<?> i: interfaces) {
 				System.out.println(i.getName());
+				classObjects.add(i);
 			}
 			System.out.println();
 		}
@@ -127,7 +139,7 @@ public class Inspector {
 				}
 				System.out.println();
 			}
-
+		}
 		}
 	}
 	public String modifierString(int m) {
