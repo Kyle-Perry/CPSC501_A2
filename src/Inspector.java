@@ -129,6 +129,11 @@ public class Inspector {
 						}				
 						else {
 							System.out.print(fieldObject.getClass().getName()+"@"+fieldObject.hashCode());
+							if(recursive) {
+								System.out.println("\n=========BEGINNING INSPECTION OF FIELD: " + f.getName() + "============");
+								inspect(fieldObject, recursive);
+								System.out.println("\n=========INSPECTION OF FIELD: " + f.getName() + " COMPLETED============");
+							}
 						}
 					}
 					else
@@ -140,6 +145,7 @@ public class Inspector {
 				System.out.println();
 			}
 		}
+		System.out.println();
 		}
 	}
 	public String modifierString(int m) {
