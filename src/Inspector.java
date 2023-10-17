@@ -109,7 +109,12 @@ public class Inspector {
 							if(f.getType().isArray())
 								System.out.print(getArrayInfo(f.getType(),fieldObject)+ " ");
 
-							printFieldVal(f.getType(), fieldObject, recursive);
+							System.out.print(printFieldVal(f.getType(), fieldObject));
+							if(recursive && !(f.getType().isPrimitive())) {
+								System.out.println("\n=========BEGINNING INSPECTION OF FIELD: " + f.getName() + " in " + classObject.getName() + "============");
+								inspect(fieldObject, recursive);
+								System.out.println("\n=========INSPECTION OF FIELD: " + f.getName() + " in " + classObject.getName() + " COMPLETED============");
+							}
 						}
 						catch(Exception e){
 							System.out.print(" !FAILED ACCESS!\n");
@@ -121,9 +126,9 @@ public class Inspector {
 				if(classObject.isArray())
 				{
 					for(int i = 0; i < Array.getLength(obj); i++) {
-						System.out.println("=============INSPECTING ELEMENT " + i + "=============");
+						System.out.println("INSPECTING ELEMENT " + i + " OF ARRAY " + classObject.getName());
 						inspect(Array.get(obj, i), recursive);
-						System.out.println("========INSPECTION OF ELEMENT " + i + " COMPLETED======");
+						System.out.println("END OF INSPECTION FOR ELEMENT " + i + " OF ARRAY " + classObject.getName() + '\n');
 					}
 				}
 				System.out.println();
@@ -211,61 +216,57 @@ public class Inspector {
 		}
 	}
 
-	public void printFieldVal(Class fieldClass, Object obj, boolean recursive) {
+	public String printFieldVal(Class fieldClass, Object obj) {
+		String output = "";
+
 		if(obj != null ) {
 			Class objClass = obj.getClass();
 
 			if(objClass.isArray()) {
-				System.out.print("[");
+				output += "[";
 				for(int i = 0; i < Array.getLength(obj); i++){
 					Object elem = Array.get(obj, i);
 					if(elem != null)
-					{
-						printFieldVal(elem.getClass(), elem, recursive);
-					}
+						printFieldVal(elem.getClass(), elem);
 					else
-					{
-						System.out.print("null");
-					}
+						output += "null";
+					
 					if(i < Array.getLength(obj)-1)
-						System.out.print(", ");
+						output += ", ";
 				}
-				System.out.print("]");
+				output += "]";
 			}
 			else if(obj.getClass() == Integer.class) {
-				System.out.print(((Integer)obj).intValue());
+				output += ((Integer)obj).intValue();
 			}
 			else if(obj.getClass() == Double.class) {
-				System.out.print(((Double)obj).doubleValue());
+				output += ((Double)obj).doubleValue();
 			}	
 			else if(obj.getClass() == Float.class) {
-				System.out.print(((Float)obj).floatValue());
+				output += ((Float)obj).floatValue();
 			}
 			else if(obj.getClass() == Byte.class) {
-				System.out.print(((Byte)obj).byteValue());
+				output += ((Byte)obj).byteValue();
 			}		
 			else if(obj.getClass() == Short.class) {
-				System.out.print(((Short)obj).shortValue());
+				output += ((Short)obj).shortValue();
 			}	
 			else if(obj.getClass() == Long.class) {
-				System.out.print(((Long)obj).longValue());
+				output += ((Long)obj).longValue();
 			}		
 			else if(obj.getClass() == Character.class) {
-				System.out.print(((Character)obj).charValue());
+				output += ((Character)obj).charValue();
 			}			
 			else if(obj.getClass() == Boolean.class) {
-				System.out.print(((Boolean)obj).booleanValue());
+				output += ((Boolean)obj).booleanValue();
 			}				
 			else {
-				System.out.print(objClass.getName()+"@"+obj.hashCode());
-				if(recursive) {
-					System.out.println("\n=========BEGINNING INSPECTION OF FIELD: " + objClass.getName() + "============");
-					inspect(obj, recursive);
-					System.out.println("\n=========INSPECTION OF FIELD: " + objClass.getName() + " COMPLETED============");
-				}
+				output += objClass.getName()+"@"+obj.hashCode();
 			}
 		}
 		else
-			System.out.print("null");
+			output += "null";
+		return output;
 	}
+	
 }
