@@ -90,6 +90,9 @@ public class Inspector {
 			System.out.println("Declared Fields:");
 			for(Field f: fields) {
 				System.out.print(modifierString(f.getModifiers()));
+				System.out.print(f.getType().getName()+ " ");
+				System.out.print(f.getName());					
+				System.out.print(" = ");
 				try{
 					f.setAccessible(true);
 					
@@ -100,55 +103,8 @@ public class Inspector {
 						fieldObject = f.get(null);
 					
 					System.out.print(getNameInfo(f.getType(),fieldObject)+ " ");
-					System.out.print(f.getName());					
-					System.out.print(" = ");
 
-					if(fieldObject != null ) {
-						
-						if(f.getType().isArray()) {
-							System.out.print("[");
-							for(int i = 0; i < Array.getLength(fieldObject); i++){
-								System.out.print(Array.get(fieldObject, i));
-								if(i < Array.getLength(fieldObject)-1)
-									System.out.print(", ");
-							}
-							System.out.print("]");
-						}
-						else if(fieldObject.getClass() == Integer.class) {
-							System.out.print(((Integer)fieldObject).intValue());
-						}
-						else if(fieldObject.getClass() == Double.class) {
-							System.out.print(((Double)fieldObject).doubleValue());
-						}	
-						else if(fieldObject.getClass() == Float.class) {
-							System.out.print(((Float)fieldObject).floatValue());
-						}
-						else if(fieldObject.getClass() == Byte.class) {
-							System.out.print(((Byte)fieldObject).byteValue());
-						}		
-						else if(fieldObject.getClass() == Short.class) {
-							System.out.print(((Short)fieldObject).shortValue());
-						}	
-						else if(fieldObject.getClass() == Long.class) {
-							System.out.print(((Long)fieldObject).longValue());
-						}		
-						else if(fieldObject.getClass() == Character.class) {
-							System.out.print(((Character)fieldObject).charValue());
-						}			
-						else if(fieldObject.getClass() == Boolean.class) {
-							System.out.print(((Boolean)fieldObject).booleanValue());
-						}				
-						else {
-							System.out.print(fieldObject.getClass().getName()+"@"+fieldObject.hashCode());
-							if(recursive) {
-								System.out.println("\n=========BEGINNING INSPECTION OF FIELD: " + f.getName() + "============");
-								inspect(fieldObject, recursive);
-								System.out.println("\n=========INSPECTION OF FIELD: " + f.getName() + " COMPLETED============");
-							}
-						}
-					}
-					else
-						System.out.print("null");
+					printFieldVal(fieldObject, recursive);
 				}
 				catch(Exception e){
 					System.out.print(" !FAILED ACCESS!\n" + e.toString());
@@ -247,5 +203,55 @@ public class Inspector {
 		{
 			return classObject.getName();
 		}
+	}
+
+	public void printFieldVal(Object obj, boolean recursive) {
+		if(obj != null ) {
+			Class objClass = obj.getClass();
+			
+			if(objClass.isArray()) {
+				System.out.print("[");
+				for(int i = 0; i < Array.getLength(obj); i++){
+					printFieldVal(Array.get(obj, i), recursive);
+					if(i < Array.getLength(obj)-1)
+						System.out.print(", ");
+				}
+				System.out.print("]");
+			}
+			else if(obj.getClass() == Integer.class) {
+				System.out.print(((Integer)obj).intValue());
+			}
+			else if(obj.getClass() == Double.class) {
+				System.out.print(((Double)obj).doubleValue());
+			}	
+			else if(obj.getClass() == Float.class) {
+				System.out.print(((Float)obj).floatValue());
+			}
+			else if(obj.getClass() == Byte.class) {
+				System.out.print(((Byte)obj).byteValue());
+			}		
+			else if(obj.getClass() == Short.class) {
+				System.out.print(((Short)obj).shortValue());
+			}	
+			else if(obj.getClass() == Long.class) {
+				System.out.print(((Long)obj).longValue());
+			}		
+			else if(obj.getClass() == Character.class) {
+				System.out.print(((Character)obj).charValue());
+			}			
+			else if(obj.getClass() == Boolean.class) {
+				System.out.print(((Boolean)obj).booleanValue());
+			}				
+			else {
+				System.out.print(obj.getClass().getName()+"@"+obj.hashCode());
+				if(recursive) {
+					System.out.println("\n=========BEGINNING INSPECTION OF FIELD: " + objClass.getName() + "============");
+					inspect(obj, recursive);
+					System.out.println("\n=========INSPECTION OF FIELD: " + objClass.getName() + " COMPLETED============");
+				}
+			}
+		}
+		else
+			System.out.print("null");
 	}
 }
