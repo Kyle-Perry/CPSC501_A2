@@ -2,126 +2,132 @@ import java.lang.reflect.*;
 import java.util.Vector;
 
 public class Inspector {
-	Vector<Class<?>> classObjects = new Vector<Class<?>>();
 
 	public void inspect(Object obj, boolean recursive)
 	{
+		Vector<Class<?>> classObjects = new Vector<Class<?>>();
+
 		Class<?> classObject;
 
 		if(obj!= null) {
-			
-		
-		classObjects.add(obj.getClass());
-		while(!classObjects.isEmpty())
-		{
-		classObject = classObjects.firstElement();
-		classObjects.remove(0);
-		
-		Class<?> superClassObj = classObject.getSuperclass();
-		Class<?>[] interfaces = classObject.getInterfaces();
-		Constructor<?>[] constructors = classObject.getDeclaredConstructors();
-		Method[] methods = classObject.getDeclaredMethods();
-		Field[] fields = classObject.getDeclaredFields();
-		
-		System.out.println("Class Name: " + getNameInfo(classObject, obj));
-		if(superClassObj != null) {
-			System.out.println("Superclass: " + superClassObj.getName());
-			classObjects.add(superClassObj);
-		}
-		if(interfaces.length > 0) {
-			System.out.print("Interfaces: ");
-			for(Class<?> i: interfaces) {
-				System.out.print(i.getName() + " ");
-				classObjects.add(i);
-			}
-			System.out.println();
-		}
+			classObjects.insertElementAt(obj.getClass(), 0);
+			while(!classObjects.isEmpty())
+			{
+				classObject = classObjects.firstElement();
+				classObjects.remove(0);
 
-		if(constructors.length > 0)
-		{
-			System.out.println("Declared Constructors:");
-			for(Constructor<?> c: constructors) {
-				Class<?>[] params = c.getParameterTypes();
-				System.out.print(modifierString(c.getModifiers()));
-				System.out.print(c.getName()+ "(");
-				if(params.length > 0) {
-					for(int i = 0; i < params.length; i++) {
-						System.out.printf(params[i].getName());
-						if(i + 1 < params.length)
-							System.out.print(", ");
+				Class<?> superClassObj = classObject.getSuperclass();
+				Class<?>[] interfaces = classObject.getInterfaces();
+				Constructor<?>[] constructors = classObject.getDeclaredConstructors();
+				Method[] methods = classObject.getDeclaredMethods();
+				Field[] fields = classObject.getDeclaredFields();
+
+				System.out.print("Class Name: ");
+				if(classObject.isArray())
+					System.out.println(getArrayInfo(classObject, obj));
+				else
+					System.out.println(classObject.getName());
+
+				if(superClassObj != null) {
+					System.out.println("Superclass: " + superClassObj.getName());
+					classObjects.add(superClassObj);
+				}
+				if(interfaces.length > 0) {
+					System.out.print("Interfaces: ");
+					for(Class<?> i: interfaces) {
+						System.out.print(i.getName() + " ");
+						classObjects.add(i);
 					}
-				}	
-				System.out.println(") ");
-			}
-			System.out.println();
-		}
-		if(methods.length > 0)
-		{
-			System.out.println("Declared Methods: ");
-			for(Method m: methods) {
-				Class<?>[] params = m.getParameterTypes();
-				Class<?>[] exceptions = m.getExceptionTypes();
-				System.out.print(modifierString(m.getModifiers()));
-				System.out.print(m.getReturnType().getName() + " ");
-				System.out.print(m.getName()+ "(");
-				if(params.length > 0) {
-					for(int i = 0; i < params.length; i++) {
-						System.out.printf(params[i].getName());
-						if(i + 1 < params.length)
-							System.out.print(", ");
-					}
-				}	
-				System.out.print(") ");
-				if(exceptions.length > 0)
+					System.out.println();
+				}
+
+				if(constructors.length > 0)
 				{
-					System.out.print("throws ");
-					for(Class<?> e: exceptions)
-					{
-						System.out.print(e.getName() + " ");
+					System.out.println("Declared Constructors:");
+					for(Constructor<?> c: constructors) {
+						Class<?>[] params = c.getParameterTypes();
+						System.out.print(modifierString(c.getModifiers()));
+						System.out.print(c.getName()+ "(");
+						if(params.length > 0) {
+							for(int i = 0; i < params.length; i++) {
+								System.out.printf(params[i].getName());
+								if(i + 1 < params.length)
+									System.out.print(", ");
+							}
+						}	
+						System.out.println(") ");
+					}
+					System.out.println();
+				}
+				if(methods.length > 0)
+				{
+					System.out.println("Declared Methods: ");
+					for(Method m: methods) {
+						Class<?>[] params = m.getParameterTypes();
+						Class<?>[] exceptions = m.getExceptionTypes();
+						System.out.print(modifierString(m.getModifiers()));
+						System.out.print(m.getReturnType().getName() + " ");
+						System.out.print(m.getName()+ "(");
+						if(params.length > 0) {
+							for(int i = 0; i < params.length; i++) {
+								System.out.printf(params[i].getName());
+								if(i + 1 < params.length)
+									System.out.print(", ");
+							}
+						}	
+						System.out.print(") ");
+						if(exceptions.length > 0)
+						{
+							System.out.print("throws ");
+							for(Class<?> e: exceptions)
+							{
+								System.out.print(e.getName() + " ");
+							}
+						}
+						System.out.println();
+					}
+					System.out.println();
+				}
+
+				if(fields.length > 0)
+				{
+					System.out.println("Declared Fields:");
+					for(Field f: fields) {
+						System.out.print(modifierString(f.getModifiers()));
+						System.out.print(f.getType().getName()+ " ");
+						System.out.print(f.getName());					
+						System.out.print(" = ");
+						try{
+							f.setAccessible(true);
+
+							Object fieldObject;
+							if(!Modifier.isStatic(f.getModifiers()))
+								fieldObject = f.get(obj);
+							else
+								fieldObject = f.get(null);
+
+							if(f.getType().isArray())
+								System.out.print(getArrayInfo(f.getType(),fieldObject)+ " ");
+
+							printFieldVal(f.getType(), fieldObject, recursive);
+						}
+						catch(Exception e){
+							System.out.print(" !FAILED ACCESS!\n");
+							e.printStackTrace();
+						}
+						System.out.println();
+					}
+				}
+				if(classObject.isArray())
+				{
+					for(int i = 0; i < Array.getLength(obj); i++) {
+						System.out.println("=============INSPECTING ELEMENT " + i + "=============");
+						inspect(Array.get(obj, i), recursive);
+						System.out.println("========INSPECTION OF ELEMENT " + i + " COMPLETED======");
 					}
 				}
 				System.out.println();
 			}
-			System.out.println();
-		}
-
-		if(fields.length > 0)
-		{
-			System.out.println("Declared Fields:");
-			for(Field f: fields) {
-				System.out.print(modifierString(f.getModifiers()));
-				System.out.print(f.getType().getName()+ " ");
-				System.out.print(f.getName());					
-				System.out.print(" = ");
-				try{
-					f.setAccessible(true);
-					
-					Object fieldObject;
-					if(!Modifier.isStatic(f.getModifiers()))
-						fieldObject = f.get(obj);
-					else
-						fieldObject = f.get(null);
-					
-					System.out.print(getNameInfo(f.getType(),fieldObject)+ " ");
-
-					printFieldVal(fieldObject, recursive);
-				}
-				catch(Exception e){
-					System.out.print(" !FAILED ACCESS!\n" + e.toString());
-				}
-				System.out.println();
-			}
-		}
-		if(classObject.isArray())
-		{
-			for(int i = 0; i < Array.getLength(obj); i++) {
-				System.out.println("=============INSPECTING ELEMENT " + i + "=============");
-				inspect(Array.get(obj, i), recursive);
-				System.out.println("========INSPECTION OF ELEMENT " + i + " COMPLETED======");
-			}
-		}
-		System.out.println();
-		}
 		}
 		else
 		{
@@ -157,13 +163,13 @@ public class Inspector {
 		return modifiers;
 	}
 
-	public String getNameInfo(Class classObject, Object obj) {
+	public String getArrayInfo(Class classObject, Object obj) {
 		if(classObject.isArray()) {
 			String arrayInfo = "";
 			String classObjString = classObject.getName();
 			Object arrElement = obj;
 			char cur;
-			
+
 			arrayInfo = arrayInfo + "[" + Array.getLength(arrElement) + "]";
 			classObjString = classObjString.substring(1);
 			while(!classObjString.isEmpty())
@@ -197,7 +203,7 @@ public class Inspector {
 				}
 			}
 			return arrayInfo;
-			
+
 		}
 		else
 		{
@@ -205,14 +211,18 @@ public class Inspector {
 		}
 	}
 
-	public void printFieldVal(Object obj, boolean recursive) {
+	public void printFieldVal(Class fieldClass, Object obj, boolean recursive) {
 		if(obj != null ) {
 			Class objClass = obj.getClass();
-			
+
 			if(objClass.isArray()) {
 				System.out.print("[");
 				for(int i = 0; i < Array.getLength(obj); i++){
-					printFieldVal(Array.get(obj, i), recursive);
+					Object elem = Array.get(obj, i);
+					if(elem != null)
+					{
+						printFieldVal(elem.getClass(), elem, recursive);
+					}
 					if(i < Array.getLength(obj)-1)
 						System.out.print(", ");
 				}
@@ -243,7 +253,7 @@ public class Inspector {
 				System.out.print(((Boolean)obj).booleanValue());
 			}				
 			else {
-				System.out.print(obj.getClass().getName()+"@"+obj.hashCode());
+				System.out.print(objClass.getName()+"@"+obj.hashCode());
 				if(recursive) {
 					System.out.println("\n=========BEGINNING INSPECTION OF FIELD: " + objClass.getName() + "============");
 					inspect(obj, recursive);
