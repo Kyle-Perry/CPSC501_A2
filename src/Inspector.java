@@ -223,6 +223,10 @@ public class Inspector {
 					{
 						printFieldVal(elem.getClass(), elem, recursive);
 					}
+					else
+					{
+						System.out.print("null");
+					}
 					if(i < Array.getLength(obj)-1)
 						System.out.print(", ");
 				}
