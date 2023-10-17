@@ -2,14 +2,15 @@ import java.lang.reflect.*;
 import java.util.Vector;
 
 public class Inspector {
+	Vector<Class<?>> classObjects = new Vector<Class<?>>();
 
 	public void inspect(Object obj, boolean recursive)
 	{
-		Vector<Class<?>> classObjects = new Vector<Class<?>>();
-		//TODO INSPECT target AND DISPLAY INFORMATION ABOUT IT
 		Class<?> classObject;
 
-	
+		if(obj!= null) {
+			
+		
 		classObjects.add(obj.getClass());
 		while(!classObjects.isEmpty())
 		{
@@ -22,15 +23,15 @@ public class Inspector {
 		Method[] methods = classObject.getDeclaredMethods();
 		Field[] fields = classObject.getDeclaredFields();
 		
-		System.out.println("Class Name = " + classObject.getName());
+		System.out.println("Class Name: " + getNameInfo(classObject, obj));
 		if(superClassObj != null) {
-			System.out.println("Superclass = " + superClassObj.getName());
+			System.out.println("Superclass: " + superClassObj.getName());
 			classObjects.add(superClassObj);
 		}
 		if(interfaces.length > 0) {
-			System.out.println("Interfaces: ");
+			System.out.print("Interfaces: ");
 			for(Class<?> i: interfaces) {
-				System.out.println(i.getName());
+				System.out.print(i.getName() + " ");
 				classObjects.add(i);
 			}
 			System.out.println();
@@ -89,8 +90,6 @@ public class Inspector {
 			System.out.println("Declared Fields:");
 			for(Field f: fields) {
 				System.out.print(modifierString(f.getModifiers()));
-				System.out.print(f.getType().getName()+ " ");
-				System.out.print(f.getName());
 				try{
 					f.setAccessible(true);
 					
@@ -99,11 +98,23 @@ public class Inspector {
 						fieldObject = f.get(obj);
 					else
 						fieldObject = f.get(null);
-						
+					
+					System.out.print(getNameInfo(f.getType(),fieldObject)+ " ");
+					System.out.print(f.getName());					
 					System.out.print(" = ");
 
 					if(fieldObject != null ) {
-						if(fieldObject.getClass() == Integer.class) {
+						
+						if(f.getType().isArray()) {
+							System.out.print("[");
+							for(int i = 0; i < Array.getLength(fieldObject); i++){
+								System.out.print(Array.get(fieldObject, i));
+								if(i < Array.getLength(fieldObject)-1)
+									System.out.print(", ");
+							}
+							System.out.print("]");
+						}
+						else if(fieldObject.getClass() == Integer.class) {
 							System.out.print(((Integer)fieldObject).intValue());
 						}
 						else if(fieldObject.getClass() == Double.class) {
@@ -145,7 +156,20 @@ public class Inspector {
 				System.out.println();
 			}
 		}
+		if(classObject.isArray())
+		{
+			for(int i = 0; i < Array.getLength(obj); i++) {
+				System.out.println("=============INSPECTING ELEMENT " + i + "=============");
+				inspect(Array.get(obj, i), recursive);
+				System.out.println("========INSPECTION OF ELEMENT " + i + " COMPLETED======");
+			}
+		}
 		System.out.println();
+		}
+		}
+		else
+		{
+			System.out.println("null");
 		}
 	}
 	public String modifierString(int m) {
@@ -153,7 +177,7 @@ public class Inspector {
 		if(Modifier.isPublic(m))
 			modifiers += "public ";
 		if(Modifier.isProtected(m))
-			modifiers += "protected";
+			modifiers += "protected ";
 		if(Modifier.isPrivate(m))
 			modifiers += "private ";
 		if(Modifier.isAbstract(m))
@@ -177,4 +201,51 @@ public class Inspector {
 		return modifiers;
 	}
 
+	public String getNameInfo(Class classObject, Object obj) {
+		if(classObject.isArray()) {
+			String arrayInfo = "";
+			String classObjString = classObject.getName();
+			Object arrElement = obj;
+			char cur;
+			
+			arrayInfo = arrayInfo + "[" + Array.getLength(arrElement) + "]";
+			classObjString = classObjString.substring(1);
+			while(!classObjString.isEmpty())
+			{
+				switch(cur = classObjString.charAt(0))
+				{
+				case '[':
+					arrElement = Array.get(arrElement, 0);
+					arrayInfo = arrayInfo + "[" + Array.getLength(arrElement) + "]";
+					classObjString = classObjString.substring(1);
+					break;
+				case 'B':
+					return "byte" + arrayInfo;
+				case 'C':
+					return "char" + arrayInfo;
+				case 'D':
+					return "double" + arrayInfo;
+				case 'F':
+					return "float" + arrayInfo;
+				case 'I':
+					return "int" + arrayInfo;
+				case 'J':
+					return "long" + arrayInfo;
+				case 'S':
+					return "short" + arrayInfo;
+				case 'Z':
+					return "boolean" + arrayInfo;
+				case 'L':
+					classObjString = classObjString.substring(1, classObjString.length() - 1);
+					return classObjString + arrayInfo;
+				}
+			}
+			return arrayInfo;
+			
+		}
+		else
+		{
+			return classObject.getName();
+		}
+	}
 }
