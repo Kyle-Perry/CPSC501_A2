@@ -7,16 +7,17 @@ public class Inspector {
 
 	public void inspect(Object obj, boolean recursive)
 	{
-		if(inspectedIDS.contains(obj.hashCode())) {
-			System.out.print("Object " + obj.getClass().getName() + "@" + obj.hashCode() + " has already been inspected. Skipping inspection...");
-		}
-		else
-		{
-			inspectedIDS.add(obj.hashCode());
-			ArrayList<Class<?>> classObjects = new ArrayList<Class<?>>();
-			Class<?> classObject;
+		if(obj!= null) {
+			if(inspectedIDS.contains(obj.hashCode())) {
+				System.out.print("Object " + obj.getClass().getName() + "@" + obj.hashCode() + " has already been inspected. Skipping inspection...");
+			}
+			else
+			{
+				inspectedIDS.add(obj.hashCode());
+				ArrayList<Class<?>> classObjects = new ArrayList<Class<?>>();
+				Class<?> classObject;
 
-			if(obj!= null) {
+
 				classObjects.add(0, obj.getClass());
 				while(!classObjects.isEmpty())
 				{
@@ -109,17 +110,20 @@ public class Inspector {
 								inspect(Array.get(obj, i), recursive);
 								System.out.println("END OF INSPECTION FOR ELEMENT " + i + " OF ARRAY " + classObject.getName() + '\n');
 							}
+							else
+								System.out.println("ELEMENT " + i + " OF ARRAY " + classObject.getName() + " IS NULL. SKIPPING INSPECTION...");
 						}
 					}
 					System.out.println();
 				}
 			}
-			else
-			{
-				System.out.println("*NULL POINTER*");
-			}
+		}
+		else
+		{
+			System.out.println("*NULL POINTER*");
 		}
 	}
+
 	public String modifierString(int m) {
 		String modifiers = "";
 		if(Modifier.isPublic(m))
