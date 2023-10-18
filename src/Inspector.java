@@ -1,6 +1,5 @@
 import java.lang.reflect.*;
 import java.util.ArrayList;
-import java.util.Set;
 
 public class Inspector {
 	ArrayList<Integer> inspectedIDS = new ArrayList<Integer>();
@@ -57,10 +56,10 @@ public class Inspector {
 			modifiers += "private ";
 		if(Modifier.isAbstract(m))
 			modifiers += "abstract ";
-		if(Modifier.isFinal(m))
-			modifiers += "final ";
 		if(Modifier.isStatic(m))
 			modifiers += "static ";
+		if(Modifier.isFinal(m))
+			modifiers += "final ";
 		if(Modifier.isInterface(m))
 			modifiers += "interface ";
 		if(Modifier.isNative(m))
@@ -167,7 +166,10 @@ public class Inspector {
 			}			
 			else if(obj.getClass() == Boolean.class) {
 				output += ((Boolean)obj).booleanValue();
-			}				
+			}
+			else if(obj.getClass() == String.class) {
+				output += obj.toString();
+			}	
 			else {
 				output += objClass.getName()+"@"+obj.hashCode();
 			}
@@ -291,7 +293,6 @@ public class Inspector {
 		
 	}
 	
-
 	private void inspectArray(Class<?> classObject, Object obj, boolean recursive){
 	if(classObject.isArray())
 	{
