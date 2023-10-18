@@ -278,7 +278,7 @@ public class Inspector {
 		String output = "";
 		if(parameters.length > 0) {
 			for(int i = 0; i < parameters.length; i++) {
-				output += parameters[i].getType().getName();
+				output += getArrayInfo(parameters[i].getType());
 				if(i + 1 < parameters.length)
 					output += ", ";
 			}
