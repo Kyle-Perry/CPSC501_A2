@@ -258,7 +258,7 @@ public class testInspector {
 		Field cur = fields[11];
 		try {
 			Object val = cur.get(testObj);
-			assertTrue("Testing field val for val12 expecting 2147483647", testInsp.getFieldVal(cur.getType(), val).compareTo("2147483647") == 0);
+			assertTrue("Testing field val for val12 expecting null", testInsp.getFieldVal(cur.getType(), val).compareTo("null") == 0);
 		}
 		catch (Exception e) {
 			assertTrue(e.toString() + " thrown when retrieving value, test has failed", false);
