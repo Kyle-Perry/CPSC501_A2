@@ -101,19 +101,7 @@ public class Inspector {
 							System.out.println();
 						}
 					}
-					if(classObject.isArray())
-					{
-						System.out.println("Array contents: " + getFieldVal(classObject, obj));
-						for(int i = 0; i < Array.getLength(obj); i++) {
-							if(Array.get(obj, i) != null) {
-								System.out.println("INSPECTING ELEMENT " + i + " OF ARRAY " + classObject.getName());
-								inspect(Array.get(obj, i), recursive);
-								System.out.println("END OF INSPECTION FOR ELEMENT " + i + " OF ARRAY " + classObject.getName() + '\n');
-							}
-							else
-								System.out.println("ELEMENT " + i + " OF ARRAY " + classObject.getName() + " IS NULL. SKIPPING INSPECTION...");
-						}
-					}
+					inspectArray(classObject, obj, recursive);
 					System.out.println();
 				}
 			}
@@ -254,7 +242,7 @@ public class Inspector {
 		return output;
 	}
 
-	public void handleSuperclass(ArrayList<Class<?>> classObjects, Class classObject) {
+	private void handleSuperclass(ArrayList<Class<?>> classObjects, Class classObject) {
 		Class<?> superClassObj = classObject.getSuperclass();			
 		if(superClassObj != null) {
 			System.out.println("Superclass: " + superClassObj.getName());
@@ -262,7 +250,7 @@ public class Inspector {
 		}
 	}
 
-	public void handleInterfaces(ArrayList<Class<?>> classObjects, Class classObject) {
+	private void handleInterfaces(ArrayList<Class<?>> classObjects, Class classObject) {
 		Class<?>[] interfaces = classObject.getInterfaces();
 		if(interfaces.length > 0) {
 			System.out.print("Interfaces: ");
@@ -274,7 +262,7 @@ public class Inspector {
 		}
 	}
 
-	public void handleConstructors(Class classObject){
+	private void handleConstructors(Class classObject){
 		Constructor<?>[] constructors = classObject.getDeclaredConstructors();
 		if(constructors.length > 0)
 		{
@@ -296,4 +284,19 @@ public class Inspector {
 		}
 	}
 
+	private void inspectArray(Class classObject, Object obj, boolean recursive){
+	if(classObject.isArray())
+	{
+		System.out.println("Array contents: " + getFieldVal(classObject, obj));
+		for(int i = 0; i < Array.getLength(obj); i++) {
+			if(Array.get(obj, i) != null) {
+				System.out.println("INSPECTING ELEMENT " + i + " OF ARRAY " + classObject.getName());
+				inspect(Array.get(obj, i), recursive);
+				System.out.println("END OF INSPECTION FOR ELEMENT " + i + " OF ARRAY " + classObject.getName() + '\n');
+			}
+			else
+				System.out.println("ELEMENT " + i + " OF ARRAY " + classObject.getName() + " IS NULL. SKIPPING INSPECTION...");
+		}
+	}
+}
 }
