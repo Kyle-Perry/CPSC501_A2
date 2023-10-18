@@ -222,21 +222,7 @@ private void handleMethods(Class<?> classObject) {
 	{
 		System.out.println("Declared Methods: ");
 		for(Method m: methods) {
-			Class<?>[] exceptions = m.getExceptionTypes();
-			System.out.print(modifierString(m.getModifiers()));
-			System.out.print(m.getReturnType().getName() + " ");
-			System.out.print(m.getName()+ "(");
-			System.out.print(getParameterString(m.getParameters()));
-			System.out.print(") ");
-			if(exceptions.length > 0)
-			{
-				System.out.print("throws ");
-				for(Class<?> e: exceptions)
-				{
-					System.out.print(e.getName() + " ");
-				}
-			}
-			System.out.println();
+			System.out.println(getMethodString(m));
 		}
 		System.out.println();
 	}
@@ -303,6 +289,24 @@ private void handleFields(Class<?> classObject, Object obj, boolean recursive) {
 				output += parameters[i].getType().getName();
 				if(i + 1 < parameters.length)
 					output += ", ";
+			}
+		}
+		return output;
+	}
+	
+	public String getMethodString(Method m) {
+		String output = "";
+		Class<?>[] exceptions = m.getExceptionTypes();
+		output += modifierString(m.getModifiers());
+		output += m.getReturnType().getName() + " ";
+		output += m.getName()+ "(";
+		output += getParameterString(m.getParameters()) + ") ";
+		if(exceptions.length > 0)
+		{
+			output += "throws ";
+			for(Class<?> e: exceptions)
+			{
+				output += e.getName() + " ";
 			}
 		}
 		return output;
