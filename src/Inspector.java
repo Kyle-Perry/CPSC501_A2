@@ -206,10 +206,7 @@ public class Inspector {
 		{
 			System.out.println("Declared Constructors:");
 			for(Constructor<?> c: constructors) {
-				System.out.print(modifierString(c.getModifiers()));
-				System.out.print(c.getName()+ "(");
-				System.out.print(getParameterString(c.getParameters()));
-				System.out.println(") ");	
+				System.out.println(getConstructorString(c));	
 			}
 		}
 		System.out.println();
@@ -230,6 +227,8 @@ private void handleMethods(Class<?> classObject) {
 
 private void handleFields(Class<?> classObject, Object obj, boolean recursive) {
 	Field[] fields = classObject.getDeclaredFields();
+	Object fieldObject;
+
 	if(fields.length > 0)
 	{
 		System.out.println("Declared Fields:");
@@ -242,7 +241,6 @@ private void handleFields(Class<?> classObject, Object obj, boolean recursive) {
 			try{
 				f.setAccessible(true);
 
-				Object fieldObject;
 				if(!Modifier.isStatic(f.getModifiers()))
 					fieldObject = f.get(obj);
 				else
@@ -309,6 +307,14 @@ private void handleFields(Class<?> classObject, Object obj, boolean recursive) {
 				output += e.getName() + " ";
 			}
 		}
+		return output;
+	}
+	
+	public String getConstructorString(Constructor c) {
+		String output;
+		output = modifierString(c.getModifiers());
+		output += c.getName()+ "(";
+		output += getParameterString(c.getParameters()) + ") ";
 		return output;
 	}
 }
