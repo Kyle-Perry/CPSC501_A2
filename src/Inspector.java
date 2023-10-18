@@ -34,45 +34,10 @@ public class Inspector {
 					handleInterfaces(classObjects, classObject);
 					handleConstructors(classObject);
 					handleMethods(classObject);
-
-				
-					Field[] fields = classObject.getDeclaredFields();
-					if(fields.length > 0)
-					{
-						System.out.println("Declared Fields:");
-						for(Field f: fields) {
-
-							System.out.print(modifierString(f.getModifiers()));
-							System.out.print(f.getType().getName()+ " ");
-							System.out.print(f.getName());					
-							System.out.print(" = ");
-							try{
-								f.setAccessible(true);
-
-								Object fieldObject;
-								if(!Modifier.isStatic(f.getModifiers()))
-									fieldObject = f.get(obj);
-								else
-									fieldObject = f.get(null);
-
-								if(f.getType().isArray())
-									System.out.print(getArrayInfo(f.getType(),fieldObject)+ " ");
-
-								System.out.print(getFieldVal(f.getType(), fieldObject));
-								if(recursive && !(f.getType().isPrimitive()) && fieldObject != null) {
-									System.out.println("\n=========BEGINNING INSPECTION OF FIELD: " + f.getName() + " in " + classObject.getName() + "============");
-									inspect(fieldObject, recursive);
-									System.out.println("\n=========INSPECTION OF FIELD: " + f.getName() + " in " + classObject.getName() + " COMPLETED============");
-								}
-							}
-							catch(Exception e){
-								System.out.print(" !FAILED ACCESS!\n");
-							}
-							System.out.println();
-						}
-					}
+					handleFields(classObject, obj, recursive);
 					inspectArray(classObject, obj, recursive);
 					System.out.println();
+					
 				}
 			}
 		}
@@ -111,7 +76,7 @@ public class Inspector {
 		return modifiers;
 	}
 
-	public String getArrayInfo(Class classObject, Object obj) {
+	public String getArrayInfo(Class<?> classObject, Object obj) {
 		if(classObject.isArray()) {
 			String arrayInfo = "";
 			String classObjString = classObject.getName();
@@ -159,11 +124,11 @@ public class Inspector {
 		}
 	}
 
-	public String getFieldVal(Class fieldClass, Object obj) {
+	public String getFieldVal(Class<?> fieldClass, Object obj) {
 		String output = "";
 
 		if(obj != null ) {
-			Class objClass = obj.getClass();
+			Class<?> objClass = obj.getClass();
 
 			if(objClass.isArray()) {
 				output += "[";
@@ -212,7 +177,7 @@ public class Inspector {
 		return output;
 	}
 
-	private void handleSuperclass(ArrayList<Class<?>> classObjects, Class classObject) {
+	private void handleSuperclass(ArrayList<Class<?>> classObjects, Class<?> classObject) {
 		Class<?> superClassObj = classObject.getSuperclass();			
 		if(superClassObj != null) {
 			System.out.println("Superclass: " + superClassObj.getName());
@@ -220,7 +185,7 @@ public class Inspector {
 		}
 	}
 
-	private void handleInterfaces(ArrayList<Class<?>> classObjects, Class classObject) {
+	private void handleInterfaces(ArrayList<Class<?>> classObjects, Class<?> classObject) {
 		Class<?>[] interfaces = classObject.getInterfaces();
 		if(interfaces.length > 0) {
 			System.out.print("Interfaces: ");
@@ -232,7 +197,7 @@ public class Inspector {
 		}
 	}
 
-	private void handleConstructors(Class classObject){
+	private void handleConstructors(Class<?> classObject){
 		Constructor<?>[] constructors = classObject.getDeclaredConstructors();
 		if(constructors.length > 0)
 		{
@@ -254,7 +219,7 @@ public class Inspector {
 		}
 	}
 
-	private void handleMethods(Class classObject) {
+	private void handleMethods(Class<?> classObject) {
 		Method[] methods = classObject.getDeclaredMethods();
 		if(methods.length > 0)
 		{
@@ -286,7 +251,48 @@ public class Inspector {
 			System.out.println();
 		}
 	}
-	private void inspectArray(Class classObject, Object obj, boolean recursive){
+	
+	private void handleFields(Class<?> classObject, Object obj, boolean recursive) {
+		Field[] fields = classObject.getDeclaredFields();
+		if(fields.length > 0)
+		{
+			System.out.println("Declared Fields:");
+			for(Field f: fields) {
+
+				System.out.print(modifierString(f.getModifiers()));
+				System.out.print(f.getType().getName()+ " ");
+				System.out.print(f.getName());					
+				System.out.print(" = ");
+				try{
+					f.setAccessible(true);
+
+					Object fieldObject;
+					if(!Modifier.isStatic(f.getModifiers()))
+						fieldObject = f.get(obj);
+					else
+						fieldObject = f.get(null);
+
+					if(f.getType().isArray())
+						System.out.print(getArrayInfo(f.getType(),fieldObject)+ " ");
+
+					System.out.print(getFieldVal(f.getType(), fieldObject));
+					if(recursive && !(f.getType().isPrimitive()) && fieldObject != null) {
+						System.out.println("\n=========BEGINNING INSPECTION OF FIELD: " + f.getName() + " in " + classObject.getName() + "============");
+						inspect(fieldObject, recursive);
+						System.out.println("\n=========INSPECTION OF FIELD: " + f.getName() + " in " + classObject.getName() + " COMPLETED============");
+					}
+				}
+				catch(Exception e){
+					System.out.print(" !FAILED ACCESS!\n");
+				}
+				System.out.println();
+			}
+		}
+		
+	}
+	
+
+	private void inspectArray(Class<?> classObject, Object obj, boolean recursive){
 	if(classObject.isArray())
 	{
 		System.out.println("Array contents: " + getFieldVal(classObject, obj));
