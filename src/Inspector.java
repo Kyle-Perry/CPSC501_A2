@@ -240,7 +240,7 @@ public class Inspector {
 						fieldObject = f.get(obj);
 					else
 						fieldObject = f.get(null);
-
+					
 					System.out.print(getFieldString(f, fieldObject) + " = ");
 
 					System.out.print(getFieldVal(f.getType(), fieldObject));
@@ -251,7 +251,7 @@ public class Inspector {
 					}
 				}
 				catch(Exception e){
-					System.out.print(" !FAILED ACCESS!\n");
+					System.out.print(modifierString(f.getModifiers()) + getArrayInfo(f.getType()) + ' ' + f.getName() + " = !FAILED ACCESS!\n");
 				}
 				System.out.println();
 			}
