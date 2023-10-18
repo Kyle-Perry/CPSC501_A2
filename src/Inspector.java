@@ -23,16 +23,7 @@ public class Inspector {
 					System.out.println(classObject.getName());
 
 				handleSuperclass(classObjects, classObject);
-				
-				Class<?>[] interfaces = classObject.getInterfaces();
-				if(interfaces.length > 0) {
-					System.out.print("Interfaces: ");
-					for(Class<?> i: interfaces) {
-						System.out.print(i.getName() + " ");
-						classObjects.add(i);
-					}
-					System.out.println();			
-				}
+				handleInterfaces(classObjects, classObject);
 				
 				Constructor<?>[] constructors = classObject.getDeclaredConstructors();
 				if(constructors.length > 0)
@@ -274,6 +265,18 @@ public class Inspector {
 		if(superClassObj != null) {
 			System.out.println("Superclass: " + superClassObj.getName());
 			classObjects.add(superClassObj);
+		}
+	}
+	
+	public void handleInterfaces(ArrayList<Class<?>> classObjects, Class classObject) {
+		Class<?>[] interfaces = classObject.getInterfaces();
+		if(interfaces.length > 0) {
+			System.out.print("Interfaces: ");
+			for(Class<?> i: interfaces) {
+				System.out.print(i.getName() + " ");
+				classObjects.add(i);
+			}
+			System.out.println();
 		}
 	}
 	
