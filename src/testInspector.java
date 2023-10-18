@@ -1,9 +1,8 @@
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.*;
 import java.util.List;
-import java.util.Random;
 
 import org.junit.BeforeClass;
 
@@ -22,11 +21,8 @@ public class testInspector {
 		public String[] val11 = new String[3];
 		public List<Integer> val12;
 
-		public void func(int a, boolean b) {}
-		private int foo(byte b, byte b2, boolean z) {return 0;}
 
 		public tester() {
-
 		}
 
 		@Override
@@ -34,6 +30,10 @@ public class testInspector {
 			// TODO Auto-generated method stub
 			return 0;
 		}
+		
+		public void func(int a) {}
+		private int foo(byte b[], byte b2, boolean z) {return 0;}
+		protected char[] bar() {char[] a = {'a','b','c'}; return a;}
 	}
 	static tester testObj;
 	static Inspector testInsp;
@@ -263,5 +263,33 @@ public class testInspector {
 		catch (Exception e) {
 			assertTrue(e.toString() + " thrown when retrieving value, test has failed", false);
 		}
+	}
+	
+	@Test
+	public void testParameter1() {
+		Method[] ms = tester.class.getDeclaredMethods();
+		String mString = testInsp.getParameterString(ms[0].getParameters());
+		assertTrue("Testing parameter list for constructor of tester, actual=\""+ mString +"\" expected=\"java.lang.Object\"", mString.compareTo("java.lang.Object") == 0);
+	}
+	
+	@Test
+	public void testParameter2() {
+		Method[] ms = tester.class.getDeclaredMethods();
+		String mString = testInsp.getParameterString(ms[1].getParameters());
+		assertTrue("Testing parameter list for constructor of tester, actual=\""+ mString +"\" expected=\"int\"", mString.compareTo("int") == 0);
+	}
+	
+	@Test
+	public void testParameter3() {
+		Method[] ms = tester.class.getDeclaredMethods();
+		String mString = testInsp.getParameterString(ms[2].getParameters());
+		assertTrue("Testing parameter list for constructor of tester, actual=\""+ mString +"\" expected=\"\"", mString.compareTo("byte[], byte, boolean") == 0);
+	}
+	
+	@Test
+	public void testParameter4() {
+		Method[] ms = tester.class.getDeclaredMethods();
+		String mString = testInsp.getParameterString(ms[3].getParameters());
+		assertTrue("Testing parameter list for constructor of tester, actual=\""+ mString +"\" expected=\"\"", mString.compareTo("") == 0);
 	}
 }
