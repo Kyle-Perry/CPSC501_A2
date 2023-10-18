@@ -93,6 +93,7 @@ public class Inspector {
 				{
 					System.out.println("Declared Fields:");
 					for(Field f: fields) {
+						
 						System.out.print(modifierString(f.getModifiers()));
 						System.out.print(f.getType().getName()+ " ");
 						System.out.print(f.getName());					
@@ -109,7 +110,7 @@ public class Inspector {
 							if(f.getType().isArray())
 								System.out.print(getArrayInfo(f.getType(),fieldObject)+ " ");
 
-							System.out.print(printFieldVal(f.getType(), fieldObject));
+							System.out.print(getFieldVal(f.getType(), fieldObject));
 							if(recursive && !(f.getType().isPrimitive()) && fieldObject != null) {
 								System.out.println("\n=========BEGINNING INSPECTION OF FIELD: " + f.getName() + " in " + classObject.getName() + "============");
 								inspect(fieldObject, recursive);
@@ -124,7 +125,7 @@ public class Inspector {
 				}
 				if(classObject.isArray())
 				{
-					System.out.println("Array contents: " + printFieldVal(classObject, obj));
+					System.out.println("Array contents: " + getFieldVal(classObject, obj));
 					for(int i = 0; i < Array.getLength(obj); i++) {
 						if(Array.get(obj, i) != null) {
 							System.out.println("INSPECTING ELEMENT " + i + " OF ARRAY " + classObject.getName());
@@ -218,7 +219,7 @@ public class Inspector {
 		}
 	}
 
-	public String printFieldVal(Class fieldClass, Object obj) {
+	public String getFieldVal(Class fieldClass, Object obj) {
 		String output = "";
 
 		if(obj != null ) {
