@@ -110,7 +110,7 @@ public class Inspector {
 								System.out.print(getArrayInfo(f.getType(),fieldObject)+ " ");
 
 							System.out.print(printFieldVal(f.getType(), fieldObject));
-							if(recursive && !(f.getType().isPrimitive())) {
+							if(recursive && !(f.getType().isPrimitive()) && fieldObject != null) {
 								System.out.println("\n=========BEGINNING INSPECTION OF FIELD: " + f.getName() + " in " + classObject.getName() + "============");
 								inspect(fieldObject, recursive);
 								System.out.println("\n=========INSPECTION OF FIELD: " + f.getName() + " in " + classObject.getName() + " COMPLETED============");
@@ -118,17 +118,19 @@ public class Inspector {
 						}
 						catch(Exception e){
 							System.out.print(" !FAILED ACCESS!\n");
-							e.printStackTrace();
 						}
 						System.out.println();
 					}
 				}
 				if(classObject.isArray())
 				{
+					System.out.println("Array contents: " + printFieldVal(classObject, obj));
 					for(int i = 0; i < Array.getLength(obj); i++) {
-						System.out.println("INSPECTING ELEMENT " + i + " OF ARRAY " + classObject.getName());
-						inspect(Array.get(obj, i), recursive);
-						System.out.println("END OF INSPECTION FOR ELEMENT " + i + " OF ARRAY " + classObject.getName() + '\n');
+						if(Array.get(obj, i) != null) {
+							System.out.println("INSPECTING ELEMENT " + i + " OF ARRAY " + classObject.getName());
+							inspect(Array.get(obj, i), recursive);
+							System.out.println("END OF INSPECTION FOR ELEMENT " + i + " OF ARRAY " + classObject.getName() + '\n');
+						}
 					}
 				}
 				System.out.println();
@@ -227,7 +229,7 @@ public class Inspector {
 				for(int i = 0; i < Array.getLength(obj); i++){
 					Object elem = Array.get(obj, i);
 					if(elem != null)
-						printFieldVal(elem.getClass(), elem);
+						output += printFieldVal(elem.getClass(), elem);
 					else
 						output += "null";
 					
@@ -265,7 +267,7 @@ public class Inspector {
 			}
 		}
 		else
-			output += "null";
+			output = "null";
 		return output;
 	}
 	
