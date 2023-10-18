@@ -84,37 +84,14 @@ public class Inspector {
 
 			arrayInfo = arrayInfo + "[" + Array.getLength(arrElement) + "]";
 			classObjString = classObjString.substring(1);
-			while(!classObjString.isEmpty())
+			while(classObjString.charAt(0) == '[')
 			{
-				switch(classObjString.charAt(0))
-				{
-				case '[':
-					arrElement = Array.get(arrElement, 0);
-					arrayInfo = arrayInfo + "[" + Array.getLength(arrElement) + "]";
-					classObjString = classObjString.substring(1);
-					break;
-				case 'B':
-					return "byte" + arrayInfo;
-				case 'C':
-					return "char" + arrayInfo;
-				case 'D':
-					return "double" + arrayInfo;
-				case 'F':
-					return "float" + arrayInfo;
-				case 'I':
-					return "int" + arrayInfo;
-				case 'J':
-					return "long" + arrayInfo;
-				case 'S':
-					return "short" + arrayInfo;
-				case 'Z':
-					return "boolean" + arrayInfo;
-				case 'L':
-					classObjString = classObjString.substring(1, classObjString.length() - 1);
-					return classObjString + arrayInfo;
-				}
+				arrElement = Array.get(arrElement, 0);
+				arrayInfo = arrayInfo + "[" + Array.getLength(arrElement) + "]";
+				classObjString = classObjString.substring(1);
 			}
-			return arrayInfo;
+			
+			return  getArrayType(classObjString) + arrayInfo;
 
 		}
 		else
@@ -212,52 +189,52 @@ public class Inspector {
 	}
 
 
-private void handleMethods(Class<?> classObject) {
-	Method[] methods = classObject.getDeclaredMethods();
-	if(methods.length > 0)
-	{
-		System.out.println("Declared Methods: ");
-		for(Method m: methods) {
-			System.out.println(getMethodString(m));
-		}
-		System.out.println();
-	}
-}
-
-private void handleFields(Class<?> classObject, Object obj, boolean recursive) {
-	Field[] fields = classObject.getDeclaredFields();
-	Object fieldObject;
-
-	if(fields.length > 0)
-	{
-		System.out.println("Declared Fields:");
-		for(Field f: fields) {
-
-				
-			try{
-				f.setAccessible(true);
-
-				if(!Modifier.isStatic(f.getModifiers()))
-					fieldObject = f.get(obj);
-				else
-					fieldObject = f.get(null);
-
-				System.out.print(getFieldString(f, fieldObject) + " = ");
-
-				System.out.print(getFieldVal(f.getType(), fieldObject));
-				if(recursive && !(f.getType().isPrimitive()) && fieldObject != null) {
-					System.out.println("\n=========BEGINNING INSPECTION OF FIELD: " + f.getName() + " in " + classObject.getName() + "============");
-					inspect(fieldObject, recursive);
-					System.out.println("\n=========INSPECTION OF FIELD: " + f.getName() + " in " + classObject.getName() + " COMPLETED============");
-				}
-			}
-			catch(Exception e){
-				System.out.print(" !FAILED ACCESS!\n");
+	private void handleMethods(Class<?> classObject) {
+		Method[] methods = classObject.getDeclaredMethods();
+		if(methods.length > 0)
+		{
+			System.out.println("Declared Methods: ");
+			for(Method m: methods) {
+				System.out.println(getMethodString(m));
 			}
 			System.out.println();
 		}
 	}
-}
+
+	private void handleFields(Class<?> classObject, Object obj, boolean recursive) {
+		Field[] fields = classObject.getDeclaredFields();
+		Object fieldObject;
+
+		if(fields.length > 0)
+		{
+			System.out.println("Declared Fields:");
+			for(Field f: fields) {
+
+
+				try{
+					f.setAccessible(true);
+
+					if(!Modifier.isStatic(f.getModifiers()))
+						fieldObject = f.get(obj);
+					else
+						fieldObject = f.get(null);
+
+					System.out.print(getFieldString(f, fieldObject) + " = ");
+
+					System.out.print(getFieldVal(f.getType(), fieldObject));
+					if(recursive && !(f.getType().isPrimitive()) && fieldObject != null) {
+						System.out.println("\n=========BEGINNING INSPECTION OF FIELD: " + f.getName() + " in " + classObject.getName() + "============");
+						inspect(fieldObject, recursive);
+						System.out.println("\n=========INSPECTION OF FIELD: " + f.getName() + " in " + classObject.getName() + " COMPLETED============");
+					}
+				}
+				catch(Exception e){
+					System.out.print(" !FAILED ACCESS!\n");
+				}
+				System.out.println();
+			}
+		}
+	}
 
 
 	private void inspectArray(Class<?> classObject, Object obj, boolean recursive){
@@ -286,7 +263,7 @@ private void handleFields(Class<?> classObject, Object obj, boolean recursive) {
 		}
 		return output;
 	}
-	
+
 	public String getMethodString(Method m) {
 		String output = "";
 		Class<?>[] exceptions = m.getExceptionTypes();
@@ -304,7 +281,7 @@ private void handleFields(Class<?> classObject, Object obj, boolean recursive) {
 		}
 		return output;
 	}
-	
+
 	public String getConstructorString(Constructor c) {
 		String output;
 		output = modifierString(c.getModifiers());
@@ -312,7 +289,7 @@ private void handleFields(Class<?> classObject, Object obj, boolean recursive) {
 		output += getParameterString(c.getParameters()) + ") ";
 		return output;
 	}
-	
+
 	public String getFieldString(Field f, Object fObject) {
 		String output = modifierString(f.getModifiers());
 		if(f.getType().isArray())
@@ -320,5 +297,31 @@ private void handleFields(Class<?> classObject, Object obj, boolean recursive) {
 		else
 			output += f.getType().getName()+ " ";
 		return output + f.getName();	
+	}
+	
+	public String getArrayType(String typeName) {
+		switch(typeName.charAt(0))
+		{
+		case 'B':
+			return "byte";
+		case 'C':
+			return "char";
+		case 'D':
+			return "double";
+		case 'F':
+			return "float";
+		case 'I':
+			return "int";
+		case 'J':
+			return "long";
+		case 'S':
+			return "short";
+		case 'Z':
+			return "boolean";
+		case 'L':
+			return typeName.substring(1, typeName.length() - 1);
+		default:
+			return "";
+		}
 	}
 }
