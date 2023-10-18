@@ -33,39 +33,9 @@ public class Inspector {
 					handleSuperclass(classObjects, classObject);
 					handleInterfaces(classObjects, classObject);
 					handleConstructors(classObject);
+					handleMethods(classObject);
 
-
-					Method[] methods = classObject.getDeclaredMethods();
-					if(methods.length > 0)
-					{
-						System.out.println("Declared Methods: ");
-						for(Method m: methods) {
-							Class<?>[] params = m.getParameterTypes();
-							Class<?>[] exceptions = m.getExceptionTypes();
-							System.out.print(modifierString(m.getModifiers()));
-							System.out.print(m.getReturnType().getName() + " ");
-							System.out.print(m.getName()+ "(");
-							if(params.length > 0) {
-								for(int i = 0; i < params.length; i++) {
-									System.out.printf(params[i].getName());
-									if(i + 1 < params.length)
-										System.out.print(", ");
-								}
-							}	
-							System.out.print(") ");
-							if(exceptions.length > 0)
-							{
-								System.out.print("throws ");
-								for(Class<?> e: exceptions)
-								{
-									System.out.print(e.getName() + " ");
-								}
-							}
-							System.out.println();
-						}
-						System.out.println();
-					}
-
+				
 					Field[] fields = classObject.getDeclaredFields();
 					if(fields.length > 0)
 					{
@@ -284,6 +254,38 @@ public class Inspector {
 		}
 	}
 
+	private void handleMethods(Class classObject) {
+		Method[] methods = classObject.getDeclaredMethods();
+		if(methods.length > 0)
+		{
+			System.out.println("Declared Methods: ");
+			for(Method m: methods) {
+				Class<?>[] params = m.getParameterTypes();
+				Class<?>[] exceptions = m.getExceptionTypes();
+				System.out.print(modifierString(m.getModifiers()));
+				System.out.print(m.getReturnType().getName() + " ");
+				System.out.print(m.getName()+ "(");
+				if(params.length > 0) {
+					for(int i = 0; i < params.length; i++) {
+						System.out.printf(params[i].getName());
+						if(i + 1 < params.length)
+							System.out.print(", ");
+					}
+				}	
+				System.out.print(") ");
+				if(exceptions.length > 0)
+				{
+					System.out.print("throws ");
+					for(Class<?> e: exceptions)
+					{
+						System.out.print(e.getName() + " ");
+					}
+				}
+				System.out.println();
+			}
+			System.out.println();
+		}
+	}
 	private void inspectArray(Class classObject, Object obj, boolean recursive){
 	if(classObject.isArray())
 	{
