@@ -28,7 +28,8 @@ public class Inspector {
 						System.out.println(getArrayInfo(classObject, obj));
 					else
 						System.out.println(classObject.getName());
-
+					System.out.println("Hash Code: " + obj.hashCode());
+					
 					handleSuperclass(classObjects, classObject);
 					handleInterfaces(classObjects, classObject);
 					handleConstructors(classObject);
