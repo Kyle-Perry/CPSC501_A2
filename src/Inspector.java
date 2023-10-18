@@ -24,26 +24,8 @@ public class Inspector {
 
 				handleSuperclass(classObjects, classObject);
 				handleInterfaces(classObjects, classObject);
-				
-				Constructor<?>[] constructors = classObject.getDeclaredConstructors();
-				if(constructors.length > 0)
-				{
-					System.out.println("Declared Constructors:");
-					for(Constructor<?> c: constructors) {
-						Class<?>[] params = c.getParameterTypes();
-						System.out.print(modifierString(c.getModifiers()));
-						System.out.print(c.getName()+ "(");
-						if(params.length > 0) {
-							for(int i = 0; i < params.length; i++) {
-								System.out.printf(params[i].getName());
-								if(i + 1 < params.length)
-									System.out.print(", ");
-							}
-						}	
-						System.out.println(") ");
-					}
-					System.out.println();
-				}
+				handleConstructors(classObject);
+
 				
 				Method[] methods = classObject.getDeclaredMethods();
 				if(methods.length > 0)
@@ -275,6 +257,28 @@ public class Inspector {
 			for(Class<?> i: interfaces) {
 				System.out.print(i.getName() + " ");
 				classObjects.add(i);
+			}
+			System.out.println();
+		}
+	}
+	
+	public void handleConstructors(Class classObject){
+		Constructor<?>[] constructors = classObject.getDeclaredConstructors();
+		if(constructors.length > 0)
+		{
+			System.out.println("Declared Constructors:");
+			for(Constructor<?> c: constructors) {
+				Class<?>[] params = c.getParameterTypes();
+				System.out.print(modifierString(c.getModifiers()));
+				System.out.print(c.getName()+ "(");
+				if(params.length > 0) {
+					for(int i = 0; i < params.length; i++) {
+						System.out.printf(params[i].getName());
+						if(i + 1 < params.length)
+							System.out.print(", ");
+					}
+				}	
+				System.out.println(") ");
 			}
 			System.out.println();
 		}
