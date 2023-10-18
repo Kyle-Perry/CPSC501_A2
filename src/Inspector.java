@@ -1,26 +1,20 @@
 import java.lang.reflect.*;
-import java.util.Vector;
+import java.util.ArrayList;
 
 public class Inspector {
 
 	public void inspect(Object obj, boolean recursive)
 	{
-		Vector<Class<?>> classObjects = new Vector<Class<?>>();
+		ArrayList<Class<?>> classObjects = new ArrayList<Class<?>>();
 
 		Class<?> classObject;
 
 		if(obj!= null) {
-			classObjects.insertElementAt(obj.getClass(), 0);
+			classObjects.add(0, obj.getClass());
 			while(!classObjects.isEmpty())
 			{
-				classObject = classObjects.firstElement();
+				classObject = classObjects.get(0);
 				classObjects.remove(0);
-
-				Class<?> superClassObj = classObject.getSuperclass();
-				Class<?>[] interfaces = classObject.getInterfaces();
-				Constructor<?>[] constructors = classObject.getDeclaredConstructors();
-				Method[] methods = classObject.getDeclaredMethods();
-				Field[] fields = classObject.getDeclaredFields();
 
 				System.out.print("Class Name: ");
 				if(classObject.isArray())
@@ -28,19 +22,19 @@ public class Inspector {
 				else
 					System.out.println(classObject.getName());
 
-				if(superClassObj != null) {
-					System.out.println("Superclass: " + superClassObj.getName());
-					classObjects.add(superClassObj);
-				}
+				handleSuperclass(classObjects, classObject);
+				
+				Class<?>[] interfaces = classObject.getInterfaces();
 				if(interfaces.length > 0) {
 					System.out.print("Interfaces: ");
 					for(Class<?> i: interfaces) {
 						System.out.print(i.getName() + " ");
 						classObjects.add(i);
 					}
-					System.out.println();
+					System.out.println();			
 				}
-
+				
+				Constructor<?>[] constructors = classObject.getDeclaredConstructors();
 				if(constructors.length > 0)
 				{
 					System.out.println("Declared Constructors:");
@@ -59,6 +53,8 @@ public class Inspector {
 					}
 					System.out.println();
 				}
+				
+				Method[] methods = classObject.getDeclaredMethods();
 				if(methods.length > 0)
 				{
 					System.out.println("Declared Methods: ");
@@ -88,7 +84,8 @@ public class Inspector {
 					}
 					System.out.println();
 				}
-
+				
+				Field[] fields = classObject.getDeclaredFields();
 				if(fields.length > 0)
 				{
 					System.out.println("Declared Fields:");
@@ -230,7 +227,7 @@ public class Inspector {
 				for(int i = 0; i < Array.getLength(obj); i++){
 					Object elem = Array.get(obj, i);
 					if(elem != null)
-						output += printFieldVal(elem.getClass(), elem);
+						output += getFieldVal(elem.getClass(), elem);
 					else
 						output += "null";
 					
@@ -270,6 +267,14 @@ public class Inspector {
 		else
 			output = "null";
 		return output;
+	}
+	
+	public void handleSuperclass(ArrayList<Class<?>> classObjects, Class classObject) {
+		Class<?> superClassObj = classObject.getSuperclass();			
+		if(superClassObj != null) {
+			System.out.println("Superclass: " + superClassObj.getName());
+			classObjects.add(superClassObj);
+		}
 	}
 	
 }
