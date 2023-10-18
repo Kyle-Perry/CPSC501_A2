@@ -100,6 +100,28 @@ public class Inspector {
 		}
 	}
 
+	public String getArrayInfo(Class<?> classObject) {
+		if(classObject.isArray()) {
+			String arrayInfo = "";
+			String classObjString = classObject.getName();
+
+			arrayInfo = arrayInfo + "[]";
+			classObjString = classObjString.substring(1);
+			while(classObjString.charAt(0) == '[')
+			{
+				arrayInfo = arrayInfo + "[]";
+				classObjString = classObjString.substring(1);
+			}
+			
+			return  getArrayType(classObjString) + arrayInfo;
+
+		}
+		else
+		{
+			return classObject.getName();
+		}
+	}
+	
 	public String getFieldVal(Class<?> fieldClass, Object obj) {
 		String output = "";
 
@@ -268,7 +290,8 @@ public class Inspector {
 		String output = "";
 		Class<?>[] exceptions = m.getExceptionTypes();
 		output += modifierString(m.getModifiers());
-		output += m.getReturnType().getName() + " ";
+		
+		output += getArrayInfo(m.getReturnType()) +  " ";
 		output += m.getName()+ "(";
 		output += getParameterString(m.getParameters()) + ") ";
 		if(exceptions.length > 0)
