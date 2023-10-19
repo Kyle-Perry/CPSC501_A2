@@ -2,6 +2,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.BeforeClass;
@@ -22,16 +23,15 @@ public class testInspector {
 		public List<Integer> val12;
 
 
-		public tester() {
-		}
-
-		@Override
-		public int compareTo(Object o) {
-			// TODO Auto-generated method stub
-			return 0;
+		public tester(int val, char[] vars){
 		}
 		
-		public void func(int a) {}
+		@Override
+		public int compareTo(Object o){
+			return 0;
+		}
+
+		public void func(int a) throws Exception{}
 		private int foo(byte b[], byte b2, boolean z) {return 0;}
 		protected char[] bar() {char[] a = {'a','b','c'}; return a;}
 	}
@@ -40,11 +40,11 @@ public class testInspector {
 
 	@BeforeClass
 	public static void intializeTest() {
-
+		char[] arr = {'a','b','c'};
 		testInspector temp = new testInspector();
 		testInsp = new Inspector();
 
-		testObj = temp.new tester();
+		testObj = temp.new tester(3, arr);
 		testObj.val1 = 2147483647;
 		testObj.val2 = 'a';
 		testObj.val3 = "test string";
@@ -264,32 +264,81 @@ public class testInspector {
 			assertTrue(e.toString() + " thrown when retrieving value, test has failed", false);
 		}
 	}
-	
+
 	@Test
 	public void testParameter1() {
 		Method[] ms = tester.class.getDeclaredMethods();
 		String mString = testInsp.getParameterString(ms[0].getParameters());
-		assertTrue("Testing parameter list for constructor of tester, actual=\""+ mString +"\" expected=\"java.lang.Object\"", mString.compareTo("java.lang.Object") == 0);
+		assertTrue("Testing parameter list for " + ms[0].getName() + " of tester, actual=\""+ mString +"\" expected=\"java.lang.Object\"", mString.compareTo("java.lang.Object") == 0);
 	}
-	
+
 	@Test
 	public void testParameter2() {
-		Method[] ms = tester.class.getDeclaredMethods();
-		String mString = testInsp.getParameterString(ms[1].getParameters());
-		assertTrue("Testing parameter list for constructor of tester, actual=\""+ mString +"\" expected=\"int\"", mString.compareTo("int") == 0);
+		Constructor[] cs = tester.class.getDeclaredConstructors();
+		String cString = testInsp.getParameterString(cs[0].getParameters());
+		assertTrue("Testing parameter list for " + cs[0].getName() + " of tester, actual=\""+ cString +"\" expected=\"testInspector, int, char[]\"", cString.compareTo("testInspector, int, char[]") == 0);
 	}
-	
+
 	@Test
-	public void testParameter3() {
+	public void testMethod1() {
 		Method[] ms = tester.class.getDeclaredMethods();
-		String mString = testInsp.getParameterString(ms[2].getParameters());
-		assertTrue("Testing parameter list for constructor of tester, actual=\""+ mString +"\" expected=\"\"", mString.compareTo("byte[], byte, boolean") == 0);
+		String mString = testInsp.getMethodString(ms[0]);
+		ArrayList<String> mStrings = new ArrayList<String>();
+		for(Method m: ms)
+		{
+			mStrings.add(testInsp.getMethodString(m));
+		}
+		assertTrue(testStrings("public int compareTo(java.lang.Object) ", mStrings));
+		assertTrue("public void func(int) throws java.lang.Exception ", testStrings("public void func(int) throws java.lang.Exception ", mStrings));
+		assertTrue("private int foo(byte[], byte, boolean) ", testStrings("private int foo(byte[], byte, boolean) ", mStrings));
+		assertTrue("protected char[] bar() ", testStrings("protected char[] bar() ", mStrings));
+		
+		
 	}
-	
+
 	@Test
-	public void testParameter4() {
-		Method[] ms = tester.class.getDeclaredMethods();
-		String mString = testInsp.getParameterString(ms[3].getParameters());
-		assertTrue("Testing parameter list for constructor of tester, actual=\""+ mString +"\" expected=\"\"", mString.compareTo("") == 0);
+	public void testConstructor() {
+		Constructor[] cs = tester.class.getDeclaredConstructors();
+		String cString = testInsp.getConstructorString(cs[0]);
+		assertTrue("Testing constructor string for " + cs[0].getName() + " of tester, actual=\""+ cString +"\" expected=\"public testInspector$tester(testInspector, int, char[]) \"", cString.compareTo("public testInspector$tester(testInspector, int, char[]) ") == 0);
+	}
+
+	@Test
+	public void testFields() {
+		Field[] fields = tester.class.getDeclaredFields();
+		ArrayList<String> fieldStrings = new ArrayList<String>();
+		Object val;
+		try {
+			for(Field f: fields)
+			{
+				f.setAccessible(true);
+				val = f.get(testObj);
+				fieldStrings.add(testInsp.getFieldString(f, val));
+			}
+			assertTrue("public int val1", testStrings("public int val1", fieldStrings));
+			assertTrue("public char val2", testStrings("public char val2", fieldStrings));
+			assertTrue("public java.lang.String val3", testStrings("public java.lang.String val3", fieldStrings));
+			assertTrue("public static final boolean val4", testStrings("public static final boolean val4", fieldStrings));
+			assertTrue("byte val5", testStrings("byte val5", fieldStrings));
+			assertTrue("private short val6", testStrings("private short val6", fieldStrings));
+			assertTrue("protected long val7", testStrings("protected long val7", fieldStrings));
+			assertTrue("public double val8", testStrings("public double val8", fieldStrings));
+			assertTrue("public float[4] val9", testStrings("public float[4] val9", fieldStrings));
+			assertTrue("public int[3][3] val10", testStrings("public int[3][3] val10", fieldStrings));
+			assertTrue("public java.lang.String[3] val11", testStrings("public java.lang.String[3] val11", fieldStrings));
+			assertTrue("public java.util.List val12", testStrings("public java.util.List val12", fieldStrings));
+
+		}
+		catch (Exception e) {
+			assertTrue(e.toString() + " thrown when retrieving field info, test has failed", false);
+		}
+	}
+
+	public boolean testStrings(String tar, ArrayList<String> list) {
+		for(String cur: list) {
+			if(cur.compareTo(tar) == 0)
+				return true;
+		}
+		return false;
 	}
 }
