@@ -266,10 +266,17 @@ public class testInspector {
 	}
 
 	@Test
-	public void testParameter1() {
+	public void testParameter1() {	
 		Method[] ms = tester.class.getDeclaredMethods();
-		String mString = testInsp.getParameterString(ms[0].getParameters());
-		assertTrue("Testing parameter list for " + ms[0].getName() + " of tester, actual=\""+ mString +"\" expected=\"java.lang.Object\"", mString.compareTo("java.lang.Object") == 0);
+		ArrayList<String> mStrings = new ArrayList<String>();
+		for(Method m: ms)
+		{
+			mStrings.add(testInsp.getParameterString(m.getParameters()));
+		}
+		assertTrue(mStrings.contains("java.lang.Object"));
+		assertTrue("int", mStrings.contains("int"));
+		assertTrue("byte[], byte, boolean ", mStrings.contains("byte[], byte, boolean"));
+		assertTrue("", mStrings.contains(""));
 	}
 
 	@Test
@@ -282,16 +289,15 @@ public class testInspector {
 	@Test
 	public void testMethod1() {
 		Method[] ms = tester.class.getDeclaredMethods();
-		String mString = testInsp.getMethodString(ms[0]);
 		ArrayList<String> mStrings = new ArrayList<String>();
 		for(Method m: ms)
 		{
 			mStrings.add(testInsp.getMethodString(m));
 		}
-		assertTrue(testStrings("public int compareTo(java.lang.Object) ", mStrings));
-		assertTrue("public void func(int) throws java.lang.Exception ", testStrings("public void func(int) throws java.lang.Exception ", mStrings));
-		assertTrue("private int foo(byte[], byte, boolean) ", testStrings("private int foo(byte[], byte, boolean) ", mStrings));
-		assertTrue("protected char[] bar() ", testStrings("protected char[] bar() ", mStrings));
+		assertTrue(mStrings.contains("public int compareTo(java.lang.Object) "));
+		assertTrue("public void func(int) throws java.lang.Exception ", mStrings.contains("public void func(int) throws java.lang.Exception "));
+		assertTrue("private int foo(byte[], byte, boolean) ", mStrings.contains("private int foo(byte[], byte, boolean) "));
+		assertTrue("protected char[] bar() ", mStrings.contains("protected char[] bar() "));
 		
 		
 	}
@@ -315,30 +321,22 @@ public class testInspector {
 				val = f.get(testObj);
 				fieldStrings.add(testInsp.getFieldString(f, val));
 			}
-			assertTrue("public int val1", testStrings("public int val1", fieldStrings));
-			assertTrue("public char val2", testStrings("public char val2", fieldStrings));
-			assertTrue("public java.lang.String val3", testStrings("public java.lang.String val3", fieldStrings));
-			assertTrue("public static final boolean val4", testStrings("public static final boolean val4", fieldStrings));
-			assertTrue("byte val5", testStrings("byte val5", fieldStrings));
-			assertTrue("private short val6", testStrings("private short val6", fieldStrings));
-			assertTrue("protected long val7", testStrings("protected long val7", fieldStrings));
-			assertTrue("public double val8", testStrings("public double val8", fieldStrings));
-			assertTrue("public float[4] val9", testStrings("public float[4] val9", fieldStrings));
-			assertTrue("public int[3][3] val10", testStrings("public int[3][3] val10", fieldStrings));
-			assertTrue("public java.lang.String[3] val11", testStrings("public java.lang.String[3] val11", fieldStrings));
-			assertTrue("public java.util.List val12", testStrings("public java.util.List val12", fieldStrings));
-
+			assertTrue("public int val1", fieldStrings.contains("public int val1"));
+			assertTrue("public char val2", fieldStrings.contains("public char val2"));
+			assertTrue("public java.lang.String val3", fieldStrings.contains("public java.lang.String val3"));
+			assertTrue("public static final boolean val4", fieldStrings.contains("public static final boolean val4"));
+			assertTrue("byte val5", fieldStrings.contains("byte val5"));
+			assertTrue("private short val6", fieldStrings.contains("private short val6"));
+			assertTrue("protected long val7", fieldStrings.contains("protected long val7"));
+			assertTrue("public double val8", fieldStrings.contains("public double val8"));
+			assertTrue("public float[4] val9", fieldStrings.contains("public float[4] val9"));
+			assertTrue("public int[3][3] val10", fieldStrings.contains("public int[3][3] val10"));
+			assertTrue("public java.lang.String[3] val11", fieldStrings.contains("public java.lang.String[3] val11"));
+			assertTrue("public java.util.List val12", fieldStrings.contains("public java.util.List val12"));
 		}
 		catch (Exception e) {
 			assertTrue(e.toString() + " thrown when retrieving field info, test has failed", false);
 		}
 	}
 
-	public boolean testStrings(String tar, ArrayList<String> list) {
-		for(String cur: list) {
-			if(cur.compareTo(tar) == 0)
-				return true;
-		}
-		return false;
-	}
 }
